@@ -66,6 +66,7 @@
     }
   ],
   "dependencies": {
+    "browserify": "^14.5.0",
     "colors": "1.0.3",
     "corser": "~2.0.0",
     "ecstatic": "^2.0.0",
@@ -73,7 +74,9 @@
     "opener": "~1.4.0",
     "optimist": "0.6.x",
     "portfinder": "^1.0.13",
-    "union": "~0.4.3"
+    "union": "~0.4.3",
+    "watchify": "^3.9.0",
+    "webpack": "^3.10.0"
   },
   "devDependencies": {
     "common-style": "^3.0.0",
@@ -87,6 +90,7 @@
   "preferGlobal": "true",
   "bin": {
     "http-server": "./bin/http-server",
-    "hs": "./bin/http-server"
+    "hs": "./bin/http-server",
+    "webpack": "./bin/webpack.config.js"
   }
 }
