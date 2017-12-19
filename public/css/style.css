@@ -11,6 +11,7 @@ Green: #3db36e
 }
 
 *{ouline:none;}
+html{-webkit-tap-highlight-color:transparent;}
 
 html, body{
 	background:#000;
