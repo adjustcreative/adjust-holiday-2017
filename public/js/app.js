@@ -5,19 +5,31 @@ window.COLOR_RED_HEX = "0xea2220";
 window.COLOR_GREEN = "#3db36e";
 window.COLOR_GREEN_HEX = '0x3db36e';
 window.IMG_PATH = './img/assets/0.5x/';
-window.PLAY_STATE = false;
+window.BG_IMG_WIDTH = 1920;
+window.BG_IMG_HEIGHT = 1080;
+
 //
 var $ = require('jquery');
 var PIXI = require('pixi.js');
 
-const app = new PIXI.Application({ width:290, height:206, transparent:true });
+const app = new PIXI.Application({ width:275, height:206, transparent:true });
 document.getElementById('santa-invaders').appendChild(app.view);
 
-
+const windowWidth = $(window).width();
+const windowHeight = $(window).height();
 const invaderSize = app.renderer.width / 12;
 const bunkerSize = app.renderer.width / 9;
 const playerSize = app.renderer.width / 12;
-const bunkerY = (invaderSize*3)+40;
+
+const invaderY = invaderSize;
+const bunkerY = (invaderSize*4)+40;
+
+if(windowWidth > windowHeight){
+  const resizeRatio = $(window).width() / BG_IMG_WIDTH; 
+}else{
+  const resizeRatio = $(window).height() / BG_IMG_HEIGHT; 
+}
+// console.log(resizeRatio)
 
 var invaders = [];
 var bunkers = [];
@@ -28,8 +40,14 @@ var playerSpeed = 10;
 var playerBullets = [];
 var invaderBullets = [];
 
+var invadersContainer = undefined;
 // refernce to loaded resources...
 var loadedResources = undefined;
+var PLAY_STATE = false;
+var ASSETS_LOADED = true;
+
+
+
 
 function loadAssets(){
   var loader = new PIXI.loaders.Loader();
@@ -43,26 +61,24 @@ function loadAssets(){
 
   loader.load((loader, resources) => {
     loadedResources = resources;
-    reset();
+    // resetGame();
 
-    initInvaders();
-    initBunkers();
-    initPlayer();
-    // start the game
-    startGame();
+    showStartScreen();
+
+    // // start the game
+    // startGame();
   });
 }
 
 
-function reset(){
-  // reset the things needed 
-  invaders = [].concat();
-  invaderBullets = [].concat();
-  playerBullets = [].concat();
-}
+
 
 function initInvaders(){
-  var rows = 3, cols = 6, x=0, y=0;
+  var rows = 3, cols = 6, x=0, y=invaderY;
+
+  invadersContainer = new PIXI.Container();
+  app.stage.addChild(invadersContainer);
+
   // loop starts at 1 so that the modulus calculation works..
   for(var i=1; i<rows*cols+1; i++){
     var invader = new PIXI.Sprite(loadedResources.invader.texture);
@@ -78,19 +94,24 @@ function initInvaders(){
       x += invader.width + 10;
     }
 
-    app.stage.addChild(invader);
+    invadersContainer.addChild(invader);
     invaders.push(invader);
   }
+
 }
 
+
+
 function initBunkers(){
+  // center the bunker...
+  var bunkerOffsetX = (app.renderer.width-(((bunkerSize+40)*3)-40))/2;
   var x=0, y=0;
   // loop starts at 1 so that the modulus calculation works..
   for(var i=0; i<3; i++){
     var bunker = new PIXI.Sprite(loadedResources.bunker.texture);
-    bunker.width = app.renderer.width / 10;
+    bunker.width = bunkerSize;
     bunker.height = bunker.width;
-    bunker.x = ((bunkerSize+40)*i);
+    bunker.x = bunkerOffsetX+((bunkerSize+40)*i);
     bunker.y = bunkerY;
     app.stage.addChild(bunker);
     bunkers.push(bunker);
@@ -104,7 +125,7 @@ function initPlayer(){
   player = new PIXI.Sprite(loadedResources.player.texture);
   player.width = playerSize;
   player.height = playerSize;
-  player.x = 40;
+  player.x = (app.renderer.width/2)-(player.width/2);
   player.y = bunkerY + playerSize + 10;
   app.stage.addChild(player);
 }
@@ -112,10 +133,16 @@ function initPlayer(){
 function playerMove(dir){
   if(dir=='left'){
     player.x -= playerSpeed;
+    if(player.x < 0) player.x = 0;
   }else{
     player.x += playerSpeed;
+    if(player.x > app.renderer.width-player.width) player.x = app.renderer.width-player.width;
   }
 }
+
+
+
+
 
 
 function playerShoot(){
@@ -142,11 +169,13 @@ function invaderShoot(){
   bullet.lineStyle(thickness, COLOR_RED_HEX);
   bullet.moveTo(0,0);
   bullet.lineTo(0,thickness*4);
-  bullet.x = Math.round(invader.x+(playerSize/2));
+  bullet.x = Math.round(invadersContainer.x + (invader.x+(playerSize/2)));
   bullet.y = Math.round(invader.y);
   app.stage.addChild(bullet);
   invaderBullets.push(bullet);
 }
+
+
 
 
 function hitTest(a, b){
@@ -156,9 +185,7 @@ function hitTest(a, b){
 }
 
 
-function hitBunker(bullet, bunker){
-  app.stage.removeChild(bullet);
-}
+
 
 function hitInvader(bullet, invader){
   // play the explosion animation
@@ -175,16 +202,14 @@ function hitInvader(bullet, invader){
   explosion.animationSpeed = 0.2;
   explosion.loop = false;
   explosion.autoUpdate = true;
-  app.stage.addChild(explosion);
+  invadersContainer.addChild(explosion);
   // remove on complete and play
-  explosion.onComplete = function(){ app.stage.removeChild(this); }
+  explosion.onComplete = function(){ invadersContainer.removeChild(this); }
   explosion.play();
   // remove the invader and bullet...
   app.stage.removeChild(bullet);
-  app.stage.removeChild(invader);
+  invadersContainer.removeChild(invader);
 }
-
-
 
 
 function hitPlayer(bullet, player){
@@ -216,7 +241,56 @@ function hitPlayer(bullet, player){
 }
 
 
+function hitBunker(bullet, bunker){
+  app.stage.removeChild(bullet);
+}
+
+
+
+
+
+
+
+
+
+
+function resetGame(){
+  // reset the things needed 
+  // invaders = [].concat();
+  // invaderBullets = [].concat();
+  // playerBullets = [].concat();
+}
+
+
+function showStartScreen(){
+  // show the start screen...
+  $('#start-screen-web').css('display','inline-block');
+  $('#start-game').off();
+  $('#start-game').on('click', function(){
+    hideStartScreen();
+    startGame();
+  });
+}
+
+function hideStartScreen(){
+  $('#start-screen-web').css('display','none');
+}
+
+
+function endGame(){
+  // go through and remove all the bullets from stage, etc
+
+  // show the game over screen...
+}
+
+
+
+
+
 function startGame(){
+  initInvaders();
+  initBunkers();
+  initPlayer();
 
   PLAY_STATE = true;
 
@@ -241,9 +315,25 @@ function startGame(){
 
 
   // Listen for frame updates
+
+  var invadersDirection = 'left';
+
   app.ticker.add(() => {
 
     if(PLAY_STATE){
+      // move the invaders...
+      if(invadersDirection == 'left'){
+        invadersContainer.x += 0.5;
+        if(invadersContainer.x > app.renderer.width-invadersContainer.width){
+          invadersDirection = 'right';
+        }
+      }else{
+        invadersContainer.x -= 0.5;
+        if(invadersContainer.x < 0){
+          invadersDirection = 'left';
+        }
+      }
+
       // move player bullets up until they strike someone or go off the edge...
       for(var i=0; i<playerBullets.length; i++){
         var bullet = playerBullets[i];
