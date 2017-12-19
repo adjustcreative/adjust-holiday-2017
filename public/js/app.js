@@ -63,8 +63,8 @@ var audioInvaderExplode = new Howler.Howl({
 const app = new PIXI.Application({ width:275, height:206, transparent:true });
 document.getElementById('santa-invaders').appendChild(app.view);
 
-const windowWidth = $(window).width();
-const windowHeight = $(window).height();
+var windowWidth = $(window).width();
+var windowHeight = $(window).height();
 const invaderSize = app.renderer.width / 12;
 const bunkerSize = app.renderer.width / 9;
 const playerSize = app.renderer.width / 12;
@@ -103,7 +103,6 @@ var ASSETS_LOADED = true;
 
 
 
-
 if(MOBILE){
   // hide the browser chrome on mobile
   // When ready...
@@ -113,15 +112,25 @@ if(MOBILE){
       // Hide the address bar!
       window.scrollTo(0, 1);
     }, 0);
+
+    $(window).on("resize", function(){
+      windowWidth = $(window).width();
+      windowHeight = $(window).height();
+
+      if(MOBILE){
+        // if mobile and not landscape, zoom in a bit..
+        if(windowWidth < windowHeight){
+          $("body").css("zoom", 1.7);
+        }else{
+          $("body").css("zoom", 1);
+        }
+      }
+    });
+    $(window).resize();
+
   });
 
 
-  // if mobile and not landscape, zoom in a bit..
-  if(windowWidth < windowHeight){
-    $("body").css("zoom", 1.7);
-  }else{
-    $("body").css("zoom", 1);
-  }
 
 }
 
