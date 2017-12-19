@@ -105,7 +105,7 @@ var ASSETS_LOADED = true;
 
 if(MOBILE){
 
-  $('body').bind('touchend', function(e) { e.preventDefault(); $(this).click(); });
+  $('nozoom').bind('touchend', function(e) { e.preventDefault(); $(this).click(); });
   // hide the browser chrome on mobile
   // When ready...
   window.addEventListener("load",function() {
