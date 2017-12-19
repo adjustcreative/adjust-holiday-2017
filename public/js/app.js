@@ -24,18 +24,6 @@ window.MOBILE = md.mobile();
 // console.log( md.versionStr('Build') );       // '4.1.A.0.562'
 // console.log( md.match('playstation|xbox') ); // false
 
-if(MOBILE){
-  // hide the browser chrome on mobile
-  // When ready...
-  window.addEventListener("load",function() {
-    // Set a timeout...
-    setTimeout(function(){
-      // Hide the address bar!
-      window.scrollTo(0, 1);
-    }, 0);
-  });
-}
-
 //
 var $ = require('jquery');
 var PIXI = require('pixi.js');
@@ -112,6 +100,30 @@ var loadedResources = undefined;
 var PLAY_STATE = false;
 var GAME_INITIALIZED = false;
 var ASSETS_LOADED = true;
+
+
+
+
+if(MOBILE){
+  // hide the browser chrome on mobile
+  // When ready...
+  window.addEventListener("load",function() {
+    // Set a timeout...
+    setTimeout(function(){
+      // Hide the address bar!
+      window.scrollTo(0, 1);
+    }, 0);
+  });
+
+
+  // if mobile and not landscape, zoom in a bit..
+  if(windowWidth < windowHeight){
+    $("body").css("zoom", 1.7);
+  }else{
+    $("body").css("zoom", 1);
+  }
+
+}
 
 
 
