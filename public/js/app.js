@@ -63,8 +63,10 @@ var audioInvaderExplode = new Howler.Howl({
 const app = new PIXI.Application({ width:275, height:206, transparent:true });
 document.getElementById('santa-invaders').appendChild(app.view);
 
+
 var windowWidth = $(window).width();
 var windowHeight = $(window).height();
+
 const invaderSize = app.renderer.width / 12;
 const bunkerSize = app.renderer.width / 9;
 const playerSize = app.renderer.width / 12;
@@ -152,6 +154,7 @@ function loadAssets(){
 
   loader.load((loader, resources) => {
     loadedResources = resources;
+    hideLoadingScreen();
     showStartScreen();
     // winGame();
   });
@@ -378,6 +381,15 @@ function hitBunker(bullet, bunker){
 
 
 
+
+function showLoadingScreen(){
+  $("#loading-screen").css("display", "inline-block");
+}
+
+function hideLoadingScreen(){
+  $("#loading-screen").css("display", "none");
+}
+
 function resetGame(){
   for(var i=0; i<bunkers.length; i++){ app.stage.removeChild(bunkers[i]); }
   bunkers = [].concat();
@@ -602,6 +614,7 @@ function startGame(){
 
 
 /// load em up..
+showLoadingScreen();
 loadAssets();
 
 
