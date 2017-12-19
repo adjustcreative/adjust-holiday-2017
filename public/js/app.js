@@ -48,6 +48,11 @@ if(windowWidth > windowHeight){
 }
 // console.log(resizeRatio)
 
+const bulletSpeed = 2;
+// continuous shooting isn't fun, stop it
+const bulletFireRate = 40;
+var bulletFireRateCount = bulletFireRate;
+
 var invaders = [];
 var bunkers = [];
 var player = undefined;
@@ -58,6 +63,7 @@ var playerBullets = [];
 var invaderBullets = [];
 
 var invadersContainer = undefined;
+var invadersContainerWidth = 0;
 // refernce to loaded resources...
 var loadedResources = undefined;
 var PLAY_STATE = false;
@@ -112,6 +118,8 @@ function initInvaders(){
     invaders.push(invader);
   }
 
+  invadersContainerWidth = invadersContainer.width;
+
 }
 
 
@@ -160,16 +168,23 @@ function playerMove(dir){
 
 
 function playerShoot(){
-  // TODO: possibly just init like 10 bullets and pool them..
-  var thickness = playerSize/20;
-  var bullet = new PIXI.Graphics();
-  bullet.lineStyle(thickness, COLOR_GREEN_HEX);
-  bullet.moveTo(0,0);
-  bullet.lineTo(0,thickness*4);
-  bullet.x = Math.round(player.x+(playerSize/2));
-  bullet.y = Math.round(player.y);
-  app.stage.addChild(bullet);
-  playerBullets.push(bullet);
+
+  // don't allow continuous shooting
+
+  if(bulletFireRateCount >= bulletFireRate){
+    bulletFireRateCount=0;
+
+    // TODO: possibly just init like 10 bullets and pool them..
+    var thickness = playerSize/20;
+    var bullet = new PIXI.Graphics();
+    bullet.lineStyle(thickness, COLOR_GREEN_HEX);
+    bullet.moveTo(0,0);
+    bullet.lineTo(0,thickness*4);
+    bullet.x = Math.round(player.x+(playerSize/2));
+    bullet.y = Math.round(player.y);
+    app.stage.addChild(bullet);
+    playerBullets.push(bullet);
+  }
 }
 
 
@@ -180,13 +195,19 @@ function invaderShoot(){
   var thickness = playerSize/20;
   var bullet = new PIXI.Graphics();
   var invader = invaders[Math.floor(Math.random()*invaders.length)];
-  bullet.lineStyle(thickness, COLOR_RED_HEX);
-  bullet.moveTo(0,0);
-  bullet.lineTo(0,thickness*4);
-  bullet.x = Math.round(invadersContainer.x + (invader.x+(playerSize/2)));
-  bullet.y = Math.round(invader.y);
-  app.stage.addChild(bullet);
-  invaderBullets.push(bullet);
+  if(invader){
+    bullet.lineStyle(thickness, COLOR_RED_HEX);
+    bullet.moveTo(0,0);
+    bullet.lineTo(0,thickness*4);
+    bullet.x = Math.round(invadersContainer.x + (invader.x+(playerSize/2)));
+    bullet.y = Math.round(invader.y);
+    app.stage.addChild(bullet);
+    invaderBullets.push(bullet); 
+  }else{
+    PLAY_STATE = false;
+    app.stage.removeChild(player);
+    winGame();
+  }
 }
 
 
@@ -203,26 +224,37 @@ function hitTest(a, b){
 
 function hitInvader(bullet, invader){
   // play the explosion animation
-  var sequence = [];
-  for (var i=1; i<=7; i++){
-    var frame = PIXI.Texture.fromFrame('IvaderExplosion'+i+'@0.5x.png')
-    sequence.push(frame);
+  if(PLAY_STATE){
+    var sequence = [];
+    for (var i=1; i<=7; i++){
+      var frame = PIXI.Texture.fromFrame('IvaderExplosion'+i+'@0.5x.png')
+      sequence.push(frame);
+    }
+    var explosion = new PIXI.extras.AnimatedSprite(sequence);
+    explosion.x = invader.x - (invaderSize*1.5);
+    explosion.y = invader.y - (invaderSize*1.5);
+    explosion.width = invaderSize*4;
+    explosion.height = invaderSize*4;
+    explosion.animationSpeed = 0.2;
+    explosion.loop = false;
+    explosion.autoUpdate = true;
+    invadersContainer.addChild(explosion);
+    // remove on complete and play
+    explosion.onComplete = function(){ invadersContainer.removeChild(this); }
+    explosion.play();
+    // remove the invader and bullet...
+    app.stage.removeChild(bullet);
+
+    // remove invader
+    invadersContainer.removeChild(invader);
+
+    if(invadersContainer.children.length == 0){
+      PLAY_STATE = false;
+      app.stage.removeChild(player);
+      winGame();
+    }
+
   }
-  var explosion = new PIXI.extras.AnimatedSprite(sequence);
-  explosion.x = invader.x - (invaderSize*1.5);
-  explosion.y = invader.y - (invaderSize*1.5);
-  explosion.width = invaderSize*4;
-  explosion.height = invaderSize*4;
-  explosion.animationSpeed = 0.2;
-  explosion.loop = false;
-  explosion.autoUpdate = true;
-  invadersContainer.addChild(explosion);
-  // remove on complete and play
-  explosion.onComplete = function(){ invadersContainer.removeChild(this); }
-  explosion.play();
-  // remove the invader and bullet...
-  app.stage.removeChild(bullet);
-  invadersContainer.removeChild(invader);
 }
 
 
@@ -314,6 +346,19 @@ function endGame(){
   }
   // go through and remove all the bullets from stage, etc
   resetGame();
+  // change the game over message text to one of these random strings..
+  var messages = [
+    'You gave it your all. That\'s all we could hope for, really.',
+    'Try again. Or don\'t. It\'s your world.',
+    'Try again. And enjoy your lump of coal.',
+    'Bah humbug. What a strange phrase... you lost.',
+    'It\'s just not your year. Better luck in 2018.',
+    'Joy to the world, you lost the game.'
+  ];
+
+  var s = messages[Math.floor(Math.random()*messages.length)];
+  $("#game-over-message").html(s);
+
   // show the game over screen...
   $('#game-over-screen').css('display','inline-block');
   $('#reset-game').off();
@@ -323,6 +368,22 @@ function endGame(){
   });
 }
 
+
+function winGame(){
+  // 
+  if(MOBILE){
+    $("#mobile-controls").css("display", "none");
+  }
+  // go through and remove all the bullets from stage, etc
+  resetGame();
+  // show the game over screen...
+  $('#win-screen').css('display','inline-block');
+  $('#reset-game-win').off();
+  $('#reset-game-win').on('click', function(){
+    $('#win-screen').css('display','none');
+    startGame();
+  });
+}
 
 
 
@@ -377,12 +438,13 @@ function startGame(){
 
     app.ticker.add(() => {
       // console.log('hi')
+      bulletFireRateCount++;
 
       if(PLAY_STATE){
         // move the invaders...
         if(invadersDirection == 'left'){
           invadersContainer.x += 0.5;
-          if(invadersContainer.x > app.renderer.width-invadersContainer.width){
+          if(invadersContainer.x > app.renderer.width-invadersContainerWidth){
             invadersDirection = 'right';
           }
         }else{
@@ -416,7 +478,7 @@ function startGame(){
             }
             // 
             if(bullet.y > -20){
-              bullet.y -= 1; 
+              bullet.y -= bulletSpeed; 
             }else{
               playerBullets.splice(i,1);
               app.stage.removeChild(bullet);
@@ -445,7 +507,7 @@ function startGame(){
             }
             // 
             if(bullet.y < app.renderer.height){
-              bullet.y += 1; 
+              bullet.y += bulletSpeed; 
             }else{
               invaderBullets.splice(i,1);
               app.stage.removeChild(bullet);
