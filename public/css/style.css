@@ -91,6 +91,7 @@ button{
 
 
 
+
 #mobile-controls{
   position:absolute;
   top:0px;left:0px;
@@ -119,4 +120,12 @@ button{
   left:66%;
   width:33%;
   height:100%;
+}
+
+.carlton-dance{
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  width: 100px;
+  height: auto;
 }

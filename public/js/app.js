@@ -86,6 +86,7 @@ function loadAssets(){
   loader.load((loader, resources) => {
     loadedResources = resources;
     showStartScreen();
+    // winGame();
   });
 }
 
@@ -524,10 +525,6 @@ function startGame(){
   GAME_INITIALIZED = true;
 }
 
-
-function frameTick(){
-
-}
 
 /// load em up..
 loadAssets();
