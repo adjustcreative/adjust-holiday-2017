@@ -9,7 +9,6 @@ window.BG_IMG_WIDTH = 1920;
 window.BG_IMG_HEIGHT = 1080;
 
 
-
 var MobileDetect = require('mobile-detect');
 var md = new MobileDetect(window.navigator.userAgent);
 
@@ -24,6 +23,18 @@ window.MOBILE = md.mobile();
 // console.log( md.version('Webkit') );         // 534.3
 // console.log( md.versionStr('Build') );       // '4.1.A.0.562'
 // console.log( md.match('playstation|xbox') ); // false
+
+if(MOBILE){
+  // hide the browser chrome on mobile
+  // When ready...
+  window.addEventListener("load",function() {
+    // Set a timeout...
+    setTimeout(function(){
+      // Hide the address bar!
+      window.scrollTo(0, 1);
+    }, 0);
+  });
+}
 
 //
 var $ = require('jquery');

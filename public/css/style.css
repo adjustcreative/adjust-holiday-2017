@@ -99,7 +99,18 @@ button{
   height:100%;
   display:none;
   z-index: 1100;
+
+  font-size: 8em;
+  color: #fff;
+  text-align: center;
+  opacity: 0.5;
 }
+
+#mobile-controls .fa{
+  bottom: 80px;
+  position: absolute;
+}
+
 #mobile-controls .left{
   position:absolute;
   top:0px;
