@@ -89,3 +89,34 @@ button{
   transform: translate(-5px, -222px);
 }
 
+
+
+#mobile-controls{
+  position:absolute;
+  top:0px;left:0px;
+  width:100%;
+  height:100%;
+  display:none;
+  z-index: 1100;
+}
+#mobile-controls .left{
+  position:absolute;
+  top:0px;
+  left:0px;
+  width:33%;
+  height:100%;
+}
+#mobile-controls .middle{
+  position:absolute;
+  top:0px;
+  left:33%;
+  width:33%;
+  height:100%;
+}
+#mobile-controls .right{
+  position:absolute;
+  top:0px;
+  left:66%;
+  width:33%;
+  height:100%;
+}

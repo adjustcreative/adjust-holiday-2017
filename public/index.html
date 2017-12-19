@@ -1,6 +1,8 @@
 <html>
   <head>
     <title>Happy Holidays from Adjust Creative</title>
+    <meta name="viewport" content="user-scalable=0"> 
+
     <link href="./css/style.css" media="all" rel="stylesheet" />
   </head>
   <body>
@@ -20,8 +22,8 @@
     <section id="start-screen-mobile" class="screen-ui">
       <div class="inner">
         <h1>Happy Holidays!</h1>
-        <p>Use <i>← → or A D</i> to move.<br> <i>↑, space or W</i> to shoot.</p>
-        <button id="start-game">Play Game</button>
+        <p>Tap left or right to move.<br>Tap the middle to shoot</p>
+        <button id="start-game-mobile">Play Game</button>
       </div>
     </section>
     <section id="game-over-screen" class="screen-ui">
@@ -30,6 +32,12 @@
         <p>You gave it your all. That's all we could hope for, really.</p>
         <button id="reset-game">Try Again</button>
       </div>
+    </section>
+
+    <section id="mobile-controls">
+      <div class="left"></div>
+      <div class="middle"></div>
+      <div class="right"></div>
     </section>
 
   	<img onClick="navigateToHome()" id="adjust-creative-logo" src="./img/AdjustCreativeLogo.svg" />

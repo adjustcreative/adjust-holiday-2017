@@ -71,6 +71,7 @@
     "corser": "~2.0.0",
     "ecstatic": "^2.0.0",
     "http-proxy": "^1.8.1",
+    "mobile-detect": "^1.4.0",
     "opener": "~1.4.0",
     "optimist": "0.6.x",
     "portfinder": "^1.0.13",
