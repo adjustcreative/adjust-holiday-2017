@@ -1,40 +1,96 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-// var PIXI = require('pixi.js')
-// console.log(PIXI)
+window.COLOR_RED = "#ea2220";
+window.COLOR_GREEN = "#3db36e";
+window.IMG_PATH = './img/assets/0.5x/';
 
+//
 var PIXI = require('pixi.js');
 
-// The application will create a renderer using WebGL, if possible,
-// with a fallback to a canvas render. It will also setup the ticker
-// and the root stage PIXI.Container
-const app = new PIXI.Application();
-
-// The application will create a canvas element for you that you
-// can then insert into the DOM
+const app = new PIXI.Application({ width:290, height:206, transparent:true });
 document.getElementById('santa-invaders').appendChild(app.view);
 
-// load the texture we need
-PIXI.loader.add('bunny', 'bunny.png').load((loader, resources) => {
-    // This creates a texture from a 'bunny.png' image
-    const bunny = new PIXI.Sprite(resources.bunny.texture);
+const invaders = [];
+const bunkers = [];
+var player = undefined;
 
-    // Setup the position of the bunny
-    bunny.x = app.renderer.width / 2;
-    bunny.y = app.renderer.height / 2;
+const invaderSize = app.renderer.width / 12;
+const bunkerSize = app.renderer.width / 10;
+const playerSize = app.renderer.width / 12;
 
-    // Rotate around the center
-    bunny.anchor.x = 0.5;
-    bunny.anchor.y = 0.5;
+const bunkerY = (invaderSize*3)+40;
 
-    // Add the bunny to the scene we are building
-    app.stage.addChild(bunny);
 
-    // Listen for frame updates
-    app.ticker.add(() => {
-         // each frame we spin the bunny around a bit
-        bunny.rotation += 0.01;
-    });
-});
+function loadAssets(){
+  // load the texture we need
+  var loader = new PIXI.loaders.Loader();
+  loader.add('invader', IMG_PATH+'Invader@0.5x.png');
+  loader.add('bunker', IMG_PATH+'Bunker@0.5x.png');
+  loader.add('player', IMG_PATH+'Player@0.5x.png');
+
+  loader.load((loader, resources) => {
+    initInvaders(resources);
+    initBunkers(resources);
+    initPlayer(resources);
+  });
+}
+
+function initInvaders(resources){
+  var rows = 3, cols = 6, x=0, y=0;
+  // loop starts at 1 so that the modulus calculation works..
+  for(var i=1; i<rows*cols+1; i++){
+    var invader = new PIXI.Sprite(resources.invader.texture);
+    invader.width = invaderSize;
+    invader.height = invaderSize;
+    invader.x = x;
+    invader.y = y;
+
+    if((i % cols) == 0){
+      x = 0;
+      y += invader.width + 10; 
+    }else{
+      x += invader.width + 10;
+    }
+
+    app.stage.addChild(invader);
+    invaders.push(invader);
+  }
+}
+
+function initBunkers(resources){
+  var x=0, y=0;
+  // loop starts at 1 so that the modulus calculation works..
+  for(var i=0; i<3; i++){
+    var bunker = new PIXI.Sprite(resources.bunker.texture);
+    bunker.width = app.renderer.width / 10;
+    bunker.height = bunker.width;
+    bunker.x = ((bunkerSize+40)*i);
+    bunker.y = bunkerY;
+    app.stage.addChild(bunker);
+    bunkers.push(bunker);
+  }
+}
+
+
+function initPlayer(resources){
+  player = new PIXI.Sprite(resources.player.texture);
+  player.width = playerSize;
+  player.height = playerSize;
+  player.x = 50;
+  player.y = bunkerY + playerSize + 10;
+  app.stage.addChild(player);
+}
+
+
+function startGame(){
+    // // Listen for frame updates
+    // app.ticker.add(() => {
+    //      // each frame we spin the bunny around a bit
+    //     // invader.rotation += 0.02;
+    // });
+
+}
+
+loadAssets();
 },{"pixi.js":141}],2:[function(require,module,exports){
 /**
  * Bit twiddling hacks for JavaScript.
