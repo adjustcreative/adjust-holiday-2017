@@ -104,6 +104,8 @@ var ASSETS_LOADED = true;
 
 
 if(MOBILE){
+
+  $('body').bind('touchend', function(e) { e.preventDefault(); $(this).click(); });
   // hide the browser chrome on mobile
   // When ready...
   window.addEventListener("load",function() {
@@ -112,6 +114,7 @@ if(MOBILE){
       // Hide the address bar!
       window.scrollTo(0, 1);
     }, 0);
+
 
     $(window).on("resize", function(){
       windowWidth = $(window).width();
