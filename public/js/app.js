@@ -309,6 +309,9 @@ function showStartScreen(){
 
 
 function endGame(){
+  if(MOBILE){
+    $("#mobile-controls").css("display", "none");
+  }
   // go through and remove all the bullets from stage, etc
   resetGame();
   // show the game over screen...
