@@ -24,6 +24,10 @@ html, body{
   font-family: 'PressStart', sans-serif;
 }
 
+.smalltext{
+  font-size:0.8em;
+}
+
 .screen-ui{
   position:absolute;
   display: inline-block;

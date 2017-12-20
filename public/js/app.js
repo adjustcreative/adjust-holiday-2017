@@ -192,9 +192,11 @@ function loadAssets(){
 
   loader.load((loader, resources) => {
     loadedResources = resources;
-    hideLoadingScreen();
-    showStartScreen();
-    // winGame();
+
+    setTimeout(function(){
+      hideLoadingScreen();
+      showStartScreen();
+    }, 2000);
   });
 }
 
